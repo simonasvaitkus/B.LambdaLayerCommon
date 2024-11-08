@@ -1,5 +1,6 @@
 import json
 import uuid
+import zlib
 from typing import Any, Dict, Optional, Union
 from json.decoder import JSONDecodeError
 
@@ -39,6 +40,13 @@ class SfnCall:
             )
 
         output = json.loads(response.get('output', {}))
+
+        # If the output is compressed, decompress it.
+        if output.get('compressed'):
+            compressed_value: str = output['value']
+
+            output = json.loads(zlib.decompress(bytes.fromhex(compressed_value)))
+
         # Add http-like handling that does not break anything.
         output = self.__http_like_handling(output)
 
