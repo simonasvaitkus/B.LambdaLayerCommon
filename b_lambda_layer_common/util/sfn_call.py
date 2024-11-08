@@ -41,14 +41,14 @@ class SfnCall:
 
         output = json.loads(response.get('output', {}))
 
+        # Add http-like handling that does not break anything.
+        output = self.__http_like_handling(output)
+
         # If the output is compressed, decompress it.
         if output.get('compressed'):
             compressed_value: str = output['value']
 
             output = json.loads(zlib.decompress(bytes.fromhex(compressed_value)))
-
-        # Add http-like handling that does not break anything.
-        output = self.__http_like_handling(output)
 
         return output
 
